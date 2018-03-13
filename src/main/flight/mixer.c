@@ -250,7 +250,7 @@ static const mixer_t mixerTable[] = {
     DEF_MIXER( MIXER_AIRPLANE,          PLATFORM_AIRPLANE,   2,          true,       true,       mixerDualProp ),
     DEF_MIXER( MIXER_CUSTOM_AIRPLANE,   PLATFORM_AIRPLANE,   2,          true,       true,       NULL ),
 
-    //DEF_MIXER( MIXER_HELI_120_CCPM,     PLATFORM_HELICOPTER, 1,          true,       false,      NULL ),
+    DEF_MIXER( MIXER_HELI_120_CCPM,     PLATFORM_HELICOPTER, 1,          true,       false,      mixerDualProp ),
     //DEF_MIXER( MIXER_HELI_90_DEG,       PLATFORM_HELICOPTER, 1,          true,       false,      NULL ),
 
     //DEF_MIXER( MIXER_PPM_TO_SERVO,      PLATFORM_MULTIROTOR, 0,          true,       false,      NULL ),

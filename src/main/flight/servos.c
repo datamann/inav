@@ -126,6 +126,18 @@ static const servoMixer_t servoMixerTri[] = {
     { SERVO_RUDDER, INPUT_STABILIZED_YAW,   100, 0 },
 };
 
+static const servoMixer_t servoMixerHeli[] = {
+    { SERVO_HELI_LEFT, INPUT_STABILIZED_PITCH,   -50, 0 },
+    { SERVO_HELI_LEFT, INPUT_STABILIZED_ROLL,     87, 0 },
+    { SERVO_HELI_LEFT, INPUT_RC_AUX1,            100, 0 },
+    { SERVO_HELI_RIGHT, INPUT_STABILIZED_PITCH,  -50, 0 },
+    { SERVO_HELI_RIGHT, INPUT_STABILIZED_ROLL,   -87, 0 },
+    { SERVO_HELI_RIGHT, INPUT_RC_AUX1,           100, 0 },
+    { SERVO_HELI_TOP, INPUT_STABILIZED_PITCH,    100, 0 },
+    { SERVO_HELI_TOP, INPUT_RC_AUX1,             100, 0 },
+    { SERVO_HELI_RUD, INPUT_STABILIZED_YAW,      100, 0 },
+};
+
 // Custom mixer configuration
 typedef struct mixerRules_s {
     uint8_t servoRuleCount;
@@ -150,7 +162,7 @@ const mixerRules_t servoMixers[] = {
     { 0, 0, 0, NULL },                // MULTITYPE_OCTOFLATP
     { 0, 0, 0, NULL },                // MULTITYPE_OCTOFLATX
     { COUNT_SERVO_RULES(servoMixerAirplane), SERVO_PLANE_INDEX_MIN, SERVO_PLANE_INDEX_MAX, servoMixerAirplane },  // * MULTITYPE_AIRPLANE
-    { 0, 0, 0, NULL },                // * MIXER_HELI_120_CCPM -> disabled, never fully implemented in CF
+    { COUNT_SERVO_RULES(servoMixerHeli), SERVO_HELI_INDEX_MIN, SERVO_PLANE_INDEX_MAX, servoMixerHeli },           // * MIXER_HELI_120_CCPM
     { 0, 0, 0, NULL },                // * MIXER_HELI_90_DEG -> disabled, never fully implemented in CF
     { 0, 0, 0, NULL },                // MULTITYPE_VTAIL4
     { 0, 0, 0, NULL },                // MULTITYPE_HEX6H
