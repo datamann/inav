@@ -162,7 +162,7 @@ const mixerRules_t servoMixers[] = {
     { 0, 0, 0, NULL },                // MULTITYPE_OCTOFLATP
     { 0, 0, 0, NULL },                // MULTITYPE_OCTOFLATX
     { COUNT_SERVO_RULES(servoMixerAirplane), SERVO_PLANE_INDEX_MIN, SERVO_PLANE_INDEX_MAX, servoMixerAirplane },  // * MULTITYPE_AIRPLANE
-    { COUNT_SERVO_RULES(servoMixerHeli), SERVO_HELI_INDEX_MIN, SERVO_PLANE_INDEX_MAX, servoMixerHeli },           // * MIXER_HELI_120_CCPM
+    { COUNT_SERVO_RULES(servoMixerHeli), SERVO_HELI_INDEX_MIN, SERVO_HELI_INDEX_MAX, servoMixerHeli },            // * MIXER_HELI_120_CCPM
     { 0, 0, 0, NULL },                // * MIXER_HELI_90_DEG -> disabled, never fully implemented in CF
     { 0, 0, 0, NULL },                // MULTITYPE_VTAIL4
     { 0, 0, 0, NULL },                // MULTITYPE_HEX6H
