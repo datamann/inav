@@ -188,15 +188,17 @@ void initActiveBoxIds(void)
     }
 #endif
 
-    if (STATE(FIXED_WING)) {
+    if (STATE(FIXED_WING) || STATE(HELICOPTER)) {
         activeBoxIds[activeBoxIdCount++] = BOXMANUAL;
-        if (!feature(FEATURE_FW_LAUNCH)) {
-           activeBoxIds[activeBoxIdCount++] = BOXNAVLAUNCH;
-        }
-        activeBoxIds[activeBoxIdCount++] = BOXAUTOTRIM;
+        if (STATE(FIXED_WING)) {
+            if (!feature(FEATURE_FW_LAUNCH)) {
+               activeBoxIds[activeBoxIdCount++] = BOXNAVLAUNCH;
+            }
+            activeBoxIds[activeBoxIdCount++] = BOXAUTOTRIM;
 #if defined(AUTOTUNE_FIXED_WING)
-        activeBoxIds[activeBoxIdCount++] = BOXAUTOTUNE;
+            activeBoxIds[activeBoxIdCount++] = BOXAUTOTUNE;
 #endif
+        }
     }
 
 #ifdef USE_SERVOS
