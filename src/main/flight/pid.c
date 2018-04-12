@@ -34,6 +34,7 @@
 #include "fc/config.h"
 #include "fc/controlrate_profile.h"
 #include "fc/rc_controls.h"
+#include "fc/rc_modes.h"
 #include "fc/runtime_config.h"
 
 #include "flight/pid.h"
@@ -715,8 +716,28 @@ static void pidTurnAssistant(pidState_t *pidState)
 }
 #endif
 
+static void pidApplyFpvCameraAngleMix(pidState_t *pidState, uint8_t fpvCameraAngle)
+{
+    static uint8_t lastFpvCamAngleDegrees = 0;
+    static float cosCameraAngle = 1.0;
+    static float sinCameraAngle = 0.0;
+
+    if (lastFpvCamAngleDegrees != fpvCameraAngle) {
+        lastFpvCamAngleDegrees = fpvCameraAngle;
+        cosCameraAngle = cos_approx(DEGREES_TO_RADIANS(fpvCameraAngle));
+        sinCameraAngle = sin_approx(DEGREES_TO_RADIANS(fpvCameraAngle));
+    }
+
+    // Rotate roll/yaw command from camera-frame coordinate system to body-frame coordinate system
+    const float rollRate = pidState[ROLL].rateTarget;
+    const float yawRate = pidState[YAW].rateTarget;
+    pidState[ROLL].rateTarget = constrainf(rollRate * cosCameraAngle -  yawRate * sinCameraAngle, -GYRO_SATURATION_LIMIT, GYRO_SATURATION_LIMIT);
+    pidState[YAW].rateTarget = constrainf(yawRate * cosCameraAngle + rollRate * sinCameraAngle, -GYRO_SATURATION_LIMIT, GYRO_SATURATION_LIMIT);
+}
+
 void pidController(void)
 {
+    bool canUseFpvCameraMix = true;
     uint8_t headingHoldState = getHeadingHoldState();
 
     if (headingHoldState == HEADING_HOLD_UPDATE_HEADING) {
@@ -745,13 +766,19 @@ void pidController(void)
         const float horizonRateMagnitude = calcHorizonRateMagnitude();
         pidLevel(&pidState[FD_ROLL], FD_ROLL, horizonRateMagnitude);
         pidLevel(&pidState[FD_PITCH], FD_PITCH, horizonRateMagnitude);
+        canUseFpvCameraMix = false;     // FPVANGLEMIX is incompatible with ANGLE/HORIZON
     }
 
 #ifdef USE_FLM_TURN_ASSIST
     if (FLIGHT_MODE(TURN_ASSISTANT) || navigationRequiresTurnAssistance()) {
         pidTurnAssistant(pidState);
+        canUseFpvCameraMix = false;     // FPVANGLEMIX is incompatible with TURN_ASSISTANT
     }
 #endif
+
+    if (canUseFpvCameraMix && IS_RC_MODE_ACTIVE(BOXFPVANGLEMIX) && currentControlRateProfile->misc.fpvCamAngleDegrees) {
+        pidApplyFpvCameraAngleMix(pidState, currentControlRateProfile->misc.fpvCamAngleDegrees);
+    }
 
     // Apply setpoint rate of change limits
     for (int axis = 0; axis < 3; axis++) {
