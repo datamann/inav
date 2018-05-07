@@ -334,9 +334,14 @@ void updateActualHeading(bool headingValid, int32_t newHeading);
 void updateActualHorizontalPositionAndVelocity(bool estimateValid, float newX, float newY, float newVelX, float newVelY);
 void updateActualAltitudeAndClimbRate(bool estimateValid, float newAltitude, float newVelocity, float surfaceDistance, float surfaceVelocity, navigationEstimateStatus_e surfaceStatus);
 
+bool isGPSGlitchDetected(void);
+
 bool checkForPositionSensorTimeout(void);
 
-bool isGPSGlitchDetected(void);
+bool canActivateAltHoldMode(void);
+bool canActivatePosHoldMode(void);
+bool posEstimationHasGlobalReference(void);
+void updateMissionPresets(void);
 
 /* Multicopter-specific functions */
 void setupMulticopterAltitudeController(void);

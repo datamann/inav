@@ -125,6 +125,8 @@
 // USART3,
 #define BIND_PIN                PB11
 
+#define USE_NAV_MISSION_PRESETS
+
 #define USE_SERIAL_4WAY_BLHELI_INTERFACE
 
 #define TARGET_IO_PORTA         0xffff

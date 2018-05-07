@@ -173,7 +173,6 @@ static void setupAltitudeController(void);
 static void resetHeadingController(void);
 void resetGCSFlags(void);
 
-static bool posEstimationHasGlobalReference(void);
 static void calcualteAndSetActiveWaypoint(const navWaypoint_t * waypoint);
 static void calcualteAndSetActiveWaypointToLocalPosition(const fpVector3_t * pos);
 void calculateInitialHoldPosition(fpVector3_t * pos);
@@ -2278,17 +2277,17 @@ void switchNavigationFlightModes(void)
 /*-----------------------------------------------------------
  * desired NAV_MODE from combination of FLIGHT_MODE flags
  *-----------------------------------------------------------*/
-static bool canActivateAltHoldMode(void)
+bool canActivateAltHoldMode(void)
 {
     return (posControl.flags.estAltStatus >= EST_USABLE);
 }
 
-static bool canActivatePosHoldMode(void)
+bool canActivatePosHoldMode(void)
 {
     return (posControl.flags.estPosStatus >= EST_USABLE) && (posControl.flags.estHeadingStatus >= EST_USABLE);
 }
 
-static bool posEstimationHasGlobalReference(void)
+bool posEstimationHasGlobalReference(void)
 {
     return true;    // For now assume that we always have global coordinates available
 }
@@ -2513,6 +2512,11 @@ void updateWaypointsAndNavigationMode(void)
 
     // Update flight behaviour modifiers
     updateFlightBehaviorModifiers();
+
+    // Process mission presets
+#if defined(USE_NAV_MISSION_PRESETS)
+    updateMissionPresets();
+#endif
 
     // Process switch to a different navigation mode (if needed)
     navProcessFSMEvents(selectNavEventFromBoxModeInput());

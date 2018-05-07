@@ -77,6 +77,9 @@ static const box_t boxes[CHECKBOX_ITEM_COUNT + 1] = {
     { BOXOSDALT1, "OSD ALT 1", 42 },
     { BOXOSDALT2, "OSD ALT 2", 43 },
     { BOXOSDALT3, "OSD ALT 3", 44 },
+    { BOXMISSION1, "MISSION 1", 45 },
+    { BOXMISSION2, "MISSION 2", 46 },
+    { BOXMISSION3, "MISSION 3", 47 },
     { CHECKBOX_ITEM_COUNT, NULL, 0xFF }
 };
 
@@ -187,6 +190,11 @@ void initActiveBoxIds(void)
         activeBoxIds[activeBoxIdCount++] = BOXNAVWP;
         activeBoxIds[activeBoxIdCount++] = BOXHOMERESET;
         activeBoxIds[activeBoxIdCount++] = BOXGCSNAV;
+#if defined(USE_NAV_MISSION_PRESETS)
+        activeBoxIds[activeBoxIdCount++] = BOXMISSION1;
+        activeBoxIds[activeBoxIdCount++] = BOXMISSION2;
+        activeBoxIds[activeBoxIdCount++] = BOXMISSION3;
+#endif
     }
 #endif
 
