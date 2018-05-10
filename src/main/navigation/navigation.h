@@ -184,6 +184,7 @@ typedef enum {
 } navWaypointActions_e;
 
 typedef enum {
+    NAV_WP_FLAG_NONE = 0x00,
     NAV_WP_FLAG_LAST = 0xA5
 } navWaypointFlags_e;
 

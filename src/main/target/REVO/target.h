@@ -148,6 +148,7 @@
 #define BIND_PIN                PB11 //UART3_RX_PIN
 
 #define USE_SERIAL_4WAY_BLHELI_INTERFACE
+#define USE_NAV_MISSION_PRESETS
 
 // Number of available PWM outputs
 #define MAX_PWM_OUTPUT_PORTS    10

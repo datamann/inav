@@ -47,10 +47,97 @@
 
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h"
+#include "navigation/navigation_mission_presets.h"
 
 #if defined(USE_NAV_MISSION_PRESETS)
 
+PG_REGISTER_WITH_RESET_TEMPLATE(missionPresetsConfig_t, missionPresetsConfig, PG_MISSION_PRESETS_CONFIG, 0);
+
+PG_RESET_TEMPLATE(missionPresetsConfig_t, missionPresetsConfig,
+    .missionPresetType = {
+        [0] = MISSION_PRESET_VECTOR,
+        [1] = MISSION_PRESET_VECTOR,
+        [2] = MISSION_PRESET_VECTOR
+    },
+
+    .missionAltitudeCm = 1000,
+    .missionDistanceCm = 5000,
+);
+
 static bool canUpdateMissionFromPreset = false;
+
+static void setWaypointRelative(int wpNumber, navWaypointActions_e action, navWaypointFlags_e flag, float x, float y, float z)
+{
+    navWaypoint_t wpData;
+    gpsLocation_t wpLLH;
+    fpVector3_t wpLocal;
+
+    wpData.action = (uint8_t)action;
+    wpData.flag = (uint8_t)flag;
+    wpData.p1 = 0;
+    wpData.p2 = 0;
+    wpData.p3 = 0;
+
+    if (action == NAV_WP_ACTION_RTH) {
+        wpData.lat = 0;
+        wpData.lon = 0;
+        wpData.alt = 0;
+    }
+    else {
+        // Prepare local coordinates
+        wpLocal.x = posControl.actualState.pos.x + x;
+        wpLocal.y = posControl.actualState.pos.y + y;
+        wpLocal.z = posControl.actualState.pos.z + z;
+
+        // Convert to LLH
+        geoConvertLocalToGeodetic(&posControl.gpsOrigin, &wpLocal, &wpLLH);
+
+        // Prepare waypoint data
+        wpData.lat = wpLLH.lat;
+        wpData.lon = wpLLH.lon;
+        wpData.alt = wpLLH.alt;
+    }
+
+    // Update waypoint
+    posControl.waypointList[wpNumber - 1] = wpData;
+    posControl.waypointCount = wpNumber;
+    posControl.waypointListValid = (wpData.flag == NAV_WP_FLAG_LAST);
+}
+
+static bool loadMissionPresetVectir(void)
+{
+    // Reset waypoint list
+    resetWaypointList();
+
+    // Climb to current position 
+    setWaypointRelative(1, NAV_WP_ACTION_WAYPOINT, NAV_WP_FLAG_NONE, 0, 0, missionPresetsConfig()->missionAltitudeCm);
+
+    setWaypointRelative(2, NAV_WP_ACTION_WAYPOINT, NAV_WP_FLAG_NONE, 
+                           missionPresetsConfig()->missionDistanceCm * posControl.actualState.cosYaw - missionPresetsConfig()->missionDistanceCm * posControl.actualState.sinYaw,
+                           missionPresetsConfig()->missionDistanceCm * posControl.actualState.cosYaw - missionPresetsConfig()->missionDistanceCm * posControl.actualState.sinYaw,
+                           missionPresetsConfig()->missionAltitudeCm);
+
+    setWaypointRelative(3, NAV_WP_ACTION_RTH, NAV_WP_FLAG_LAST, 0, 0, 0);
+
+    return true;
+}
+
+static void loadMissionPreset(missionPresetType_e type)
+{
+    bool result = false;
+
+    switch (type) {
+        case MISSION_PRESET_VECTOR:
+            result = loadMissionPresetVectir();
+            break;
+        default:
+            // Unknown type, do nothing
+            break;
+    }
+
+    // Beep out operation status
+    beeper(result ? BEEPER_ACTION_SUCCESS : BEEPER_ACTION_FAIL);
+}
 
 void updateMissionPresets(void)
 {
@@ -63,12 +150,15 @@ void updateMissionPresets(void)
         if (canUpdateMissionFromPreset) {
             if (IS_RC_MODE_ACTIVE(BOXMISSION1)) {
                 // Mission preset 1
+                loadMissionPreset((missionPresetType_e)missionPresetsConfig()->missionPresetType[0]);
             } 
             else if (IS_RC_MODE_ACTIVE(BOXMISSION2)) {
                 // Mission preset 2
+                loadMissionPreset((missionPresetType_e)missionPresetsConfig()->missionPresetType[1]);
             }
             else if (IS_RC_MODE_ACTIVE(BOXMISSION3)) {
                 // Mission preset 3
+                loadMissionPreset((missionPresetType_e)missionPresetsConfig()->missionPresetType[2]);
             }
 
             // Reset flag
@@ -79,7 +169,8 @@ void updateMissionPresets(void)
         // None of the mission preset modes is enabled, now we can check the prerequisites for mission presets
         canUpdateMissionFromPreset = canActivateAltHoldMode()           // Have altitude sensor
                                   && canActivatePosHoldMode()           // Have Position/Heading sensor and it's valid and locked
-                                  && posEstimationHasGlobalReference(); // Have global position data (GPS)
+                                  && posEstimationHasGlobalReference()  // Have global position data (GPS)
+                                  && posControl.gpsOrigin.valid;        // Have valid GPS origin
     }
 
 }
