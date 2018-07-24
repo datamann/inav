@@ -1,5 +1,6 @@
 COMMON_SRC = \
             $(TARGET_DIR_SRC) \
+            init.cpp \
             main.c \
             target/common_hardware.c \
             build/assert.c \

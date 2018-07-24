@@ -214,12 +214,15 @@ endif
 
 DEBUG_FLAGS = -ggdb3 -DDEBUG
 
+CFLAGS_CC   = -std=gnu99
+
+CFLAGS_CXX  = -std=gnu++11
+
 CFLAGS      += $(ARCH_FLAGS) \
               $(LTO_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               $(DEBUG_FLAGS) \
-              -std=gnu99 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
               -Werror=switch \
               -ffunction-sections \
@@ -308,16 +311,16 @@ $(GENERATED_SETTINGS): $(SETTINGS_GENERATOR) $(SETTINGS_FILE) $(STAMP)
 CFLAGS                  += -I$(TARGET_OBJ_DIR)
 
 $(STAMP): .FORCE
-	$(V1) CFLAGS="$(CFLAGS)" TARGET=$(TARGET) ruby $(BUILD_STAMP) $(SETTINGS_FILE) $(STAMP)
+	$(V1) CFLAGS="$(CFLAGS_CC) $(CFLAGS)" TARGET=$(TARGET) ruby $(BUILD_STAMP) $(SETTINGS_FILE) $(STAMP)
 
 # Use a pattern rule, since they're different than normal rules.
 # See https://www.gnu.org/software/make/manual/make.html#Pattern-Examples
 %generated.h %generated.c:
 	$(V1) echo "settings.yaml -> settings_generated.h, settings_generated.c" "$(STDOUT)"
-	$(V1) CFLAGS="$(CFLAGS)" TARGET=$(TARGET) ruby $(SETTINGS_GENERATOR) . $(SETTINGS_FILE) -o $(TARGET_OBJ_DIR)
+	$(V1) CFLAGS="$(CFLAGS_CC) $(CFLAGS)" TARGET=$(TARGET) ruby $(SETTINGS_GENERATOR) . $(SETTINGS_FILE) -o $(TARGET_OBJ_DIR)
 
 settings-json:
-	$(V0) CFLAGS="$(CFLAGS)" TARGET=$(TARGET) ruby $(SETTINGS_GENERATOR) . $(SETTINGS_FILE) --json settings.json
+	$(V0) CFLAGS="$(CFLAGS_CC) $(CFLAGS)" TARGET=$(TARGET) ruby $(SETTINGS_GENERATOR) . $(SETTINGS_FILE) --json settings.json
 
 clean-settings:
 	$(V1) $(RM) $(GENERATED_SETTINGS)
@@ -340,7 +343,12 @@ $(TARGET_ELF): $(TARGET_OBJS)
 $(TARGET_OBJ_DIR)/%.o: %.c
 	$(V1) mkdir -p $(dir $@)
 	$(V1) echo %% $(notdir $<) "$(STDOUT)"
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $<
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CFLAGS_CC) $<
+
+$(TARGET_OBJ_DIR)/%.o: %.cpp
+	$(V1) mkdir -p $(dir $@)
+	$(V1) echo %% $(notdir $<) "$(STDOUT)"
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CFLAGS_CXX) $<
 
 # Assemble
 $(TARGET_OBJ_DIR)/%.o: %.s
