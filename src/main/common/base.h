@@ -22,18 +22,18 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+#pragma once
+
+#include <cstddef>
 #include <cstdint>
+#include <new>
 
-#include <common/base.h>
-#include <platform.h>
+// All classes should be derived from this
+class base_c {
+protected:
+    static void * operator new(std::size_t);
+    static void * operator new [] (std::size_t);
 
-/* CRT init function, called by __libc_init_array() before passing control to main */
-extern "C" void __attribute__ ((weak)) _init(void)
-{
-}
-
-/* Prevent demangle from being pulled in */
-extern "C" void __cxa_pure_virtual(void)
-{
-    while (true);
-}
+public:
+    static inline void * operator new(std::size_t s, void *p) { (void)s; return p; }
+};

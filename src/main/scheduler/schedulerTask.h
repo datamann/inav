@@ -22,18 +22,20 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-#include <cstdint>
+#pragma once
 
 #include <common/base.h>
-#include <platform.h>
+#include <common/time.h>
 
-/* CRT init function, called by __libc_init_array() before passing control to main */
-extern "C" void __attribute__ ((weak)) _init(void)
-{
-}
+// All schedulable objects should be derived from task_c
+class task_c : base_c {
+protected:
+    bool ready;
+    // Scheduler calls run(), which in turn calls task() main function
+    void run(const timeUs_t currentTimeUs, const timeDelta_t deltaTimeUs);
 
-/* Prevent demangle from being pulled in */
-extern "C" void __cxa_pure_virtual(void)
-{
-    while (true);
-}
+public:
+    virtual bool isReady(void) const;
+    virtual void setReady(bool ready);
+    virtual void task(const timeUs_t currentTimeUs, const timeDelta_t deltaTimeUs);
+};

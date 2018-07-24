@@ -22,18 +22,27 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-#include <cstdint>
-
 #include <common/base.h>
-#include <platform.h>
+#include <scheduler/schedulerTask.h>
 
-/* CRT init function, called by __libc_init_array() before passing control to main */
-extern "C" void __attribute__ ((weak)) _init(void)
+void task_c::setReady(bool _ready)
 {
+    ready = _ready;
 }
 
-/* Prevent demangle from being pulled in */
-extern "C" void __cxa_pure_virtual(void)
+bool task_c::isReady(void) const
 {
-    while (true);
+    return ready;
+}
+
+void task_c::run(const timeUs_t currentTimeUs, const timeDelta_t deltaTimeUs)
+{
+    task(currentTimeUs, deltaTimeUs);
+    setReady(false);
+}
+
+void task_c::task(const timeUs_t currentTimeUs, const timeDelta_t deltaTimeUs)
+{
+    (void)currentTimeUs;
+    (void)deltaTimeUs;
 }
