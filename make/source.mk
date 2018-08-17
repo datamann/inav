@@ -1,8 +1,7 @@
 COMMON_SRC = \
             $(TARGET_DIR_SRC) \
-            init.cpp \
             scheduler\schedulerTask.cpp \
-            main.c \
+            main.cpp \
             target/common_hardware.c \
             build/assert.c \
             build/build_config.c \

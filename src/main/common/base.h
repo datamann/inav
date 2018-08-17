@@ -24,16 +24,26 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <new>
+#ifdef __cplusplus
+    #define EXTERN_C extern "C"
 
-// All classes should be derived from this
-class base_c {
-protected:
-    static void * operator new(std::size_t);
-    static void * operator new [] (std::size_t);
+    #include <cstddef>
+    #include <cstdint>
+    #include <new>
 
-public:
-    static inline void * operator new(std::size_t s, void *p) { (void)s; return p; }
-};
+    // All classes should be derived from this
+    class base_c {
+    protected:
+        static void * operator new(std::size_t);
+        static void * operator new [] (std::size_t);
+
+    public:
+        static inline void * operator new(std::size_t s, void *p) { (void)s; return p; }
+    };
+
+#else
+
+    #define EXTERN_C
+
+#endif
+

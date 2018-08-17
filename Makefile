@@ -192,10 +192,12 @@ include $(ROOT)/make/release.mk
 # Tool names
 ifneq ($(TOOLCHAINPATH),)
 CROSS_CC    = $(TOOLCHAINPATH)/arm-none-eabi-gcc
+CROSS_CXX   = $(TOOLCHAINPATH)/arm-none-eabi-g++
 OBJCOPY     = $(TOOLCHAINPATH)/arm-none-eabi-objcopy
 SIZE        = $(TOOLCHAINPATH)/arm-none-eabi-size
 else
 CROSS_CC    = arm-none-eabi-gcc
+CROSS_CXX   = arm-none-eabi-g++
 OBJCOPY     = arm-none-eabi-objcopy
 SIZE        = arm-none-eabi-size
 endif
@@ -216,7 +218,8 @@ DEBUG_FLAGS = -ggdb3 -DDEBUG
 
 CFLAGS_CC   = -std=gnu99
 
-CFLAGS_CXX  = -std=gnu++11
+CFLAGS_CXX  = -std=c++11 \
+              -fno-rtti
 
 CFLAGS      += $(ARCH_FLAGS) \
               $(LTO_FLAGS) \
@@ -348,7 +351,7 @@ $(TARGET_OBJ_DIR)/%.o: %.c
 $(TARGET_OBJ_DIR)/%.o: %.cpp
 	$(V1) mkdir -p $(dir $@)
 	$(V1) echo %% $(notdir $<) "$(STDOUT)"
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CFLAGS_CXX) $<
+	$(V1) $(CROSS_CXX) -c -o $@ $(CFLAGS) $(CFLAGS_CXX) $<
 
 # Assemble
 $(TARGET_OBJ_DIR)/%.o: %.s
