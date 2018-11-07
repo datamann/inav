@@ -269,7 +269,11 @@ static bool mpu9250CompassRead(magDev_t * mag)
     }
 
     mag->magADCRaw[X] = -parseMag(buf + 0, magGain[X]);
-    mag->magADCRaw[Y] = parseMag(buf + 2, magGain[Y]);
+    // Testing code from INAV 1.9.1 for target FF_F35_LIGHTNING clone
+    mag->magADCRaw[Y] = -parseMag(buf + 2, magGain[Y]);
+
+    // INAV 2.1.0 code
+    //mag->magADCRaw[Y] = parseMag(buf + 2, magGain[Y]);
     mag->magADCRaw[Z] = -parseMag(buf + 4, magGain[Z]);
 
     memcpy(cachedMagData, &mag->magADCRaw, sizeof(cachedMagData));
