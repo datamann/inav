@@ -1,0 +1,26 @@
+/* 
+* Devices needed:
+* 1: SBUS
+* 1.1: FPORT / SmartPort
+* 2: GPS (UART1)
+* 3: GPS Compass (I2C)
+* 4: Smartport (Not needed if FPORT is used) (UART3)
+* 5: SmartAudio (SoftSerial)
+* 6: Baro BM280 (I2C)
+* 7: Buzzer
+* 
+* PPM = PC9 // SoftSerial
+* SBUS = ? // SBUS
+* UART1 TX = PA9
+* UART1 RX = (PA10)
+* UART3 TX = PB10
+* UART3 RX = PB11
+* UART6 TX = PC6
+* UART6 RX = PC7
+* LED = PA0
+* LED0 = PB5
+* LED1 = PB4
+* I2C SDA = PB7
+* I2C SCL =  PB6
+* BZ = PA8 
+*/
